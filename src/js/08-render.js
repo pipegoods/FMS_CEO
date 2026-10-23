@@ -489,7 +489,7 @@ function showFreestyler(id){
   <div class="modal-actions"><button class="btn" onclick="closeModal()">Cerrar</button></div>`);
 }
 function renameFreestyler(id){
-  const v=(document.getElementById('fs_name').value||'').trim();
+  const v=cleanText(document.getElementById('fs_name').value||'').trim();
   if(!v){ toast('El nombre no puede quedar vacío.'); return; }
   if(state.freestylers.some(f=>f.id!==id && f.name.toLowerCase()===v.toLowerCase())){ toast('Ya hay un freestyler con ese nombre.'); return; }
   fby(id).name=v; toast('Nombre guardado.'); render(); showFreestyler(id);

@@ -13,7 +13,7 @@ function showCreator(){
 var GEAR_SVG='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94a7.07 7.07 0 0 0 .05-.94 7.07 7.07 0 0 0-.05-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.59.24-1.13.56-1.63.94l-2.39-.96a.5.5 0 0 0-.61.22L2.7 8.48a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.61.22l2.39-.96c.5.38 1.04.7 1.63.94l.36 2.54c.04.24.25.42.49.42h3.8c.24 0 .45-.18.49-.42l.36-2.54c.59-.24 1.13-.56 1.63-.94l2.39.96c.22.08.48 0 .61-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>';
 function gameMark(){ const l=(typeof EXTRA_IMG!=='undefined' && EXTRA_IMG.gamelogo); return l ? `<img class="mark mark-img" src="${l}" alt="FMS CEO">` : '<div class="mark">F</div>'; }
 var CUSTOM_KEY='fms_ceo_custom_fs';
-function customFS(){ try{ return JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]'); }catch(e){ return []; } }
+function customFS(){ try{ return JSON.parse(localStorage.getItem(CUSTOM_KEY)||'[]').filter(c=>c && typeof c.name==='string').map(c=>({...c, name:cleanText(c.name), country:cleanText(c.country||''), style:c.style&&cleanText(c.style), photo:cleanPhoto(c.photo)})); }catch(e){ return []; } }
 function saveCustomFS(list){ try{ localStorage.setItem(CUSTOM_KEY, JSON.stringify(list)); }catch(e){ toast('No se pudo guardar el competidor (almacenamiento lleno).'); } }
 function customToF(c){ return {id:uid('f'), name:c.name, country:c.country, nivel:50, fama:50, hype:randHype(50), style:c.style, photo:c.photo||null, custom:true}; }
 var CUSTOM_COUNTRIES=['España','Argentina','México','Chile','Perú','Colombia','Uruguay','Venezuela','Cuba','Puerto Rico','República Dominicana','Panamá','Costa Rica','Guatemala','Honduras','El Salvador','Nicaragua','Ecuador','Bolivia','Paraguay','EEUU'];
@@ -47,7 +47,7 @@ function nfPhoto(inp){ const f=inp.files&&inp.files[0]; if(!f) return; const r=n
   r.onload=()=>{ const im=new Image(); im.onload=()=>{ const S=160, c=document.createElement('canvas'); c.width=S; c.height=S; const g=c.getContext('2d');
       const k=Math.max(S/im.width, S/im.height), w=im.width*k, h=im.height*k; g.drawImage(im,(S-w)/2,(S-h)/2.6,w,h);
       state.ui.newFS.photo=c.toDataURL('image/jpeg',0.82); openAddFS(); }; im.src=r.result; }; r.readAsDataURL(f); }
-function nfSave(){ const d=state.ui.newFS; const name=(d.name||'').trim(); if(!name){ toast('Ponle un nombre.'); return; }
+function nfSave(){ const d=state.ui.newFS; const name=cleanText(d.name||'').trim(); if(!name){ toast('Ponle un nombre.'); return; }
   const all=customFS(); if(all.some(c=>c.name.toLowerCase()===name.toLowerCase()) || (state.freestylers||[]).some(f=>f.name.toLowerCase()===name.toLowerCase())){ toast('Ya existe un competidor con ese nombre.'); return; }
   const c={name, country:d.country, style:d.style, photo:d.photo||null}; all.push(c); saveCustomFS(all);
   if(state.company && state.freestylers){ state.freestylers.push(customToF(c)); save(); }

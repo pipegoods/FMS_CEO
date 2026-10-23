@@ -2,7 +2,7 @@
    PARTIDA: nueva / importar / exportar
 ========================================================================= */
 function newGame(){
-  const name=(document.getElementById('ng_name').value||'').trim()||'FMS';
+  const name=cleanText(document.getElementById('ng_name').value||'').trim()||'FMS';
   state.company={name, stars:0, reputation:0, money:START_MONEY, dbv:3}; state.ui.tutQ=null;
   if(!state.ui.importedPool) state.freestylers=generatePool();
   else state.freestylers=state.ui.importedPool;
@@ -17,9 +17,9 @@ function importPoolFile(ev){
   r.onload=()=>{
     try{
       const d=JSON.parse(r.result);
-      const list=(d.freestylers||[]).filter(f=>f && f.name);
+      const list=(Array.isArray(d.freestylers)?d.freestylers:[]).filter(f=>f && typeof f.name==='string' && cleanText(f.name).trim());
       if(list.length<10) throw new Error('pocos');
-      state.ui.importedPool=list.map(f=>{ const st=genStats(); return {id:uid('f'), name:f.name, country:f.country||'España', photo:f.photo||null, nivel:st.nivel, fama:st.fama}; });
+      state.ui.importedPool=list.map(f=>{ const st=genStats(); return {id:uid('f'), name:cleanText(f.name).trim(), country:f.country?cleanText(f.country):'España', photo:cleanPhoto(f.photo), nivel:st.nivel, fama:st.fama}; });
       toast(`Importados ${list.length} freestylers. Se les han asignado nivel y fama al azar.`);
     }catch(e){ toast('Ese archivo no tiene una lista de freestylers válida (exporta desde tu gestor).'); }
     render();
@@ -35,7 +35,7 @@ function importGameFile(ev){
   const file=ev.target.files[0]; if(!file) return;
   const r=new FileReader();
   r.onload=()=>{
-    try{ const d=JSON.parse(r.result); if(!d.company) throw 0;
+    try{ const d=cleanData(JSON.parse(r.result)); if(!d.company || !Array.isArray(d.freestylers) || !Array.isArray(d.seasons) || !d.seasons.length) throw 0;
       state.company=d.company; state.freestylers=d.freestylers; state.seasons=d.seasons; state._counter=d._counter||1;
       toast('Partida cargada.'); goto('dashboard');
     }catch(e){ toast('Ese archivo no es una partida de FMS CEO.'); }

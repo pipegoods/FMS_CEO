@@ -11,6 +11,20 @@ function nameH(f){ return f ? esc(f.name) : '—'; }
 function fnameH(id){ return nameH(fby(id)); }
 function cur(){ return state.seasons[state.seasons.length-1]; }
 
+/* ---- datos de fuera (archivos importados, nombres escritos a mano): sin HTML ni comillas ---- */
+// todo se pinta con innerHTML y onclick="...('${id}')": una etiqueta o una comilla en un nombre ejecutaría código.
+// Las noticias del juego llevan <b>, así que esa etiqueta se respeta, y las marcas del juego (McDonald's) se quedan igual.
+function cleanText(s){ if(SPONSOR_BRANDS.some(b=>b[0]===s)) return s; return String(s).split(/(<\/?b>)/).map((p,i)=> i%2 ? p : p.replace(/"/g,'”').replace(/['`]/g,'’').replace(/[<>\\&]/g,'')).join(''); }
+function cleanPhoto(p){ return typeof p==='string' && /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(p) ? p : null; }
+const CLEAN_NUM = ['number','money','stars','reputation','year','day','_counter'];   // se pintan sin comillas en algún onclick
+function cleanData(v, k){
+  if(CLEAN_NUM.includes(k) && v!=null && typeof v!=='number') return Number(v)||0;
+  if(typeof v==='string') return v.startsWith('data:') ? cleanPhoto(v) : cleanText(v);
+  if(Array.isArray(v)) return v.map(x=>cleanData(x));
+  if(v && typeof v==='object'){ const o={}; for(const [kk,vv] of Object.entries(v)) o[cleanText(kk)]=cleanData(vv,kk); return o; }
+  return v;
+}
+
 function save(){
   try{
     const dump = {company:state.company, freestylers:state.freestylers, seasons:state.seasons, _counter:state._counter};
