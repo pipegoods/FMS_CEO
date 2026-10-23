@@ -18,7 +18,7 @@ function applyViewTheme(){
 }
 function render(){
   const active=document.activeElement; let focusId=null, s0=null, s1=null;
-  if(active && active.id && document.getElementById('app').contains(active)){ focusId=active.id; if(typeof active.selectionStart==='number'){ s0=active.selectionStart; s1=active.selectionEnd; } }
+  if(active && active.id && (document.getElementById('app').contains(active) || document.getElementById('topbar').contains(active))){ focusId=active.id; if(typeof active.selectionStart==='number'){ s0=active.selectionStart; s1=active.selectionEnd; } }
   const skip=_skipScrollRestore; _skipScrollRestore=false;
   const prevY=window.scrollY;
   const pg=document.querySelector('.pick-grid'); const pgTop=pg? pg.scrollTop : null;
@@ -38,12 +38,50 @@ let _toastTimer=null;
 function toast(msg){
   if(typeof SHOW!=='undefined' && SHOW) return;   // durante el espectáculo manda la línea de estado
   let el=document.getElementById('toast');
-  if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el); }
+  if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; document.body.appendChild(el); }
   el.innerHTML=msg; el.style.display='block';
+  // el lector de pantalla lo lee desde #srStatus, que ya existe al cargar (una región creada al vuelo no se anuncia)
+  const sr=document.getElementById('srStatus'); if(sr){ sr.textContent=''; setTimeout(()=>{ sr.textContent=el.textContent; }, 50); }
   clearTimeout(_toastTimer); _toastTimer=setTimeout(()=>{ el.style.display='none'; }, 3200);
 }
-function openModal(html, wide){ const mr=document.getElementById('modalRoot'); ['--red','--red-bright','--red-dark'].forEach(v=>mr.style.removeProperty(v)); mr.innerHTML=`<div class="modal-bg" onclick="if(event.target===this) closeModal()"><div class="modal ${wide===true?'wide':(wide||'')}">${html}</div></div>`; }
-function closeModal(){ document.getElementById('modalRoot').innerHTML=''; document.body.classList.remove('noscroll'); }
+function openModal(html, wide){ const mr=document.getElementById('modalRoot'); ['--red','--red-bright','--red-dark'].forEach(v=>mr.style.removeProperty(v));
+  const prev=document.activeElement, keepId=mr.contains(prev) && prev.id, keepIdx=modalFocusables(mr).indexOf(prev);
+  if(!mr.firstChild) _modalReturn=prev;
+  mr.innerHTML=`<div class="modal-bg" onclick="if(event.target===this) closeModal()"><div class="modal ${wide===true?'wide':(wide||'')}" role="dialog" aria-modal="true" tabindex="-1">${html}</div></div>`;
+  modalA11y(mr, keepId, keepIdx); }
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; document.body.classList.remove('noscroll');
+  document.getElementById('app').inert=false; document.getElementById('topbar').inert=false;
+  const r=_modalReturn; _modalReturn=null; if(r && r.isConnected) r.focus({preventScroll:true}); }
+
+/* ---------- accesibilidad: modales y elementos clicables ---------- */
+let _modalReturn=null;   // dónde estaba el foco antes de abrir el modal
+function modalFocusables(root){ return [...root.querySelectorAll('button:not(:disabled), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]; }
+// el modal se titula con su primer encabezado, el resto de la página queda inerte y el foco entra en el modal
+// (si el modal se repinta por dentro, el foco vuelve al mismo control para no perder el sitio)
+function modalA11y(mr, keepId, keepIdx){
+  const m=mr.querySelector('.modal'), h=m.querySelector('h1, h2, h3');
+  if(h){ h.id=h.id||'modalTitle'; m.setAttribute('aria-labelledby', h.id); }
+  document.getElementById('app').inert=true; document.getElementById('topbar').inert=true;
+  enhanceClickables(mr);
+  const t=(keepId && document.getElementById(keepId)) || (keepIdx>=0 && modalFocusables(mr)[keepIdx]) || m;
+  t.focus({preventScroll:true});
+}
+// divs y spans con onclick: rol de botón, foco con Tab y activación con Enter/Espacio
+const CLICKABLE='[onclick]:not(button, a, input, select, textarea, label, .modal-bg)';
+function enhanceClickables(root){
+  [...(root.matches(CLICKABLE)?[root]:[]), ...root.querySelectorAll(CLICKABLE)].forEach(el=>{
+    if(!el.hasAttribute('role')) el.setAttribute('role','button');
+    if(!el.hasAttribute('tabindex')) el.tabIndex=0;
+    if(el.classList.contains('pick-item')) el.setAttribute('aria-pressed', el.classList.contains('checked'));
+    if(el.classList.contains('disabled')) el.setAttribute('aria-disabled','true');
+  });
+}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{ if(n.nodeType===1) enhanceClickables(n); }))).observe(document.body, {childList:true, subtree:true});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && document.querySelector('#modalRoot .modal')){ closeModal(); return; }
+  if(e.target.matches && e.target.matches(CLICKABLE)){ if(e.key==='Enter'){ e.preventDefault(); e.target.click(); } else if(e.key===' ') e.preventDefault(); }
+});
+document.addEventListener('keyup', e=>{ if(e.key===' ' && e.target.matches && e.target.matches(CLICKABLE)) e.target.click(); });
 function starsHtml(n){ let h=''; for(let i=0;i<5;i++) h+= i<n? '★' : '<span class="off">★</span>'; return `<span class="stars" aria-label="${n} de 5 estrellas">${h}</span>`; }
 function leagueDot(key, size){
   const d=ldef(key); const logo=LOGOS[key];
@@ -59,17 +97,19 @@ function hypeBar(h){ return `<div class="hype-row">Hype <div class="hype"><i sty
 
 function renderTopbar(){
   const tb=document.getElementById('topbar');
-  if(!state.company){ tb.innerHTML=`<div class="topbar"><div class="brand">${gameMark()}<div class="name">FMS <span>CEO</span></div></div><div class="top-spacer"></div><button class="btn small gear-btn" onclick="openSettings()" title="Ajustes" aria-label="Ajustes">${GEAR_SVG}</button></div>`; return; }
+  if(!state.company){ document.title='FMS CEO'; tb.innerHTML=`<div class="topbar"><div class="brand">${gameMark()}<div class="name">FMS <span>CEO</span></div></div><div class="top-spacer"></div><button class="btn small gear-btn" id="gearBtn" onclick="openSettings()" title="Ajustes" aria-label="Ajustes">${GEAR_SVG}</button></div>`; return; }
   const s=cur();
   const tabs=[['dashboard','Inicio'],['calendar','Calendario'],['leagues','Ligas']];
   if(s.intlEnabled || s.intl.played) tabs.push(['intl','Internacional']);
   tabs.push(['redbull','Red Bull'],['freestylers','Freestylers'],['history','Historial']);
   const dateTxt = s.phase==='pre' ? `Pretemporada ${s.year}` : (s.phase==='done' ? `Temporada ${s.year} cerrada` : fmtDay(s.year,s.day)+' '+s.year);
+  const isTab=k=> state.view.name===k||(k==='leagues'&&state.view.name==='league');
+  document.title=`${(tabs.find(([k])=>isTab(k))||[,'Inicio'])[1]} · FMS CEO`;
   tb.innerHTML=`<div class="topbar">
     <div class="brand">${gameMark()}<div class="name">FMS <span>CEO</span></div></div>
-    <div class="navtabs">${tabs.map(([k,l])=>`<button class="navtab ${state.view.name===k||(k==='leagues'&&state.view.name==='league')?'active':''}" onclick="goto('${k}')">${l}</button>`).join('')}</div>
+    <nav class="navtabs" aria-label="Secciones">${tabs.map(([k,l])=>`<button class="navtab ${isTab(k)?'active':''}" id="nav_${k}" ${isTab(k)?'aria-current="page"':''} onclick="goto('${k}')">${l}</button>`).join('')}</nav>
     <div class="top-spacer"></div>
-    <button class="btn small gear-btn" onclick="openSettings()" title="Ajustes" aria-label="Ajustes">${GEAR_SVG}</button>
+    <button class="btn small gear-btn" id="gearBtn" onclick="openSettings()" title="Ajustes" aria-label="Ajustes">${GEAR_SVG}</button>
     <div class="date-pill">${dateTxt} &nbsp;<span class="m ${state.company.money<0?'neg':''}">${moneyK(state.company.money)}</span></div>
     ${s.phase==='live'? `<div class="time-controls">
       <button class="btn small primary" onclick="animatedAdvance('event')">Próxima fecha</button>
@@ -403,7 +443,7 @@ function renderSigning(s,key){
       const fx=isForeign(f,key); const sal=checked? L.contracts[f.id] : contractCost(f,key); const cant=!checked && sal>state.company.money;
       const od=other? ldef(other):null;
       return `<div class="pick-item ${checked?'checked':''} ${other||cant?'disabled':''} ${blocked?'relegated':''}" onclick="toggleSign('${key}','${f.id}')">
-        <span class="mini-avatar" style="width:32px;height:32px;font-size:15px;${avatarDivStyle(f)}">${avatarContent(f)}</span>
+        <span class="mini-avatar" style="width:32px;height:32px;font-size:0.9375rem;${avatarDivStyle(f)}">${avatarContent(f)}</span>
         <div style="min-width:0;"><div class="pname">${nameH(f)}</div>${styleTag(f)}${f.demand&&f.demand.year===s.year?(f.demand.good?'<span class="tag-mini dem good">🔥 Pedido por la comunidad</span>':'<span class="tag-mini dem bad">👎 No lo quieren</span>'):''}<div class="pcountry">${esc(f.country)}${fx?' <span class="tag-mini foreign" title="Extranjero: +'+Math.round((FOREIGN_MULT-1)*100)+'% por viajes">✈ viajes</span>':''}</div>
         ${od?`<span class="league-badge-tag" style="background:${od.badge};color:${od.fg}">${od.short}</span>`:''}${blocked?`<div class="relegated-tag">Descendió · vuelve en ${s.year+1}</div>`:''}</div>
         <div class="pick-stats">Nivel <b>${f.nivel}</b><br>Fama <b>${f.fama}</b><br>Hype <b>${f.hype!=null?Math.round(f.hype):'—'}</b><br><span class="sal">${moneyK(sal)}</span></div>

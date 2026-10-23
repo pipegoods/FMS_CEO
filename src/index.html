@@ -25,9 +25,10 @@
 </style>
 </head>
 <body>
-<div id="topbar"></div>
-<div id="app" class="wrap"></div>
+<header id="topbar"></header>
+<main id="app" class="wrap"></main>
 <div id="modalRoot"></div>
+<div id="srStatus" class="visually-hidden" role="status"></div>
 <input type="file" id="poolFileInput" accept="application/json" style="display:none" onchange="importPoolFile(event)">
 <input type="file" id="gameFileInput" accept="application/json" style="display:none" onchange="importGameFile(event)">
 <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="onImageFile(event)">

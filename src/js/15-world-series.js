@@ -62,7 +62,7 @@ function wsPairingEditor(s, key){
     grid=`<p class="step-note" style="margin:8px 0">Toca arriba al competidor que se enfrentará al extraplayer ${d.slot+1} (cada uno solo una vez en la temporada) y elige aquí al extraplayer. Se puede repetir extraplayer.</p>
       <input id="wsQ" class="ex-q" placeholder="Buscar extraplayer por nombre o país" value="${esc(q)}" oninput="state.ui.wsQ=this.value; render()">
       <div class="pick-grid ex-grid">${el.map(f=>`<div class="pick-item ${d.eps[d.slot].x===f.id?'checked':''}" onclick="wsPickX('${key}','${f.id}')">
-        <span class="mini-avatar" style="width:32px;height:32px;font-size:15px;${avatarDivStyle(f)}">${avatarContent(f)}</span>
+        <span class="mini-avatar" style="width:32px;height:32px;font-size:0.9375rem;${avatarDivStyle(f)}">${avatarContent(f)}</span>
         <div style="min-width:0;"><div class="pname">${nameH(f)}</div>${styleTag(f)}<div class="pcountry">${esc(f.country)}</div></div>
         <div class="pick-stats">Nivel <b>${f.nivel}</b><br>Fama <b>${f.fama}</b><br><span class="sal">${moneyK(wsEpFee(f))}</span></div></div>`).join('')}</div>`; }
   const ready=d.pairs.length===9 && d.eps.every(e=>e.c&&e.x) && !!d.sede;

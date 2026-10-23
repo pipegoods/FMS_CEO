@@ -178,7 +178,7 @@ function showUQ(ev){
   else if(ev.type==='zasko'){ kick=ev.good?'🔥 Redes':'😶 Redes'; title=ev.good?'Zasko tuvo un buen día':'Zasko tuvo un mal día';
     body= ev.good ? `<p>Zasko se salió ayer. Su batalla está volando en YouTube: <b class="pos-v">+15% de visitas</b>.</p>` : `<p>A Zasko no le salió nada ayer. <b class="neg-v">−15% de hype</b>.</p>`; }
   else if(ev.type==='pairv'){ const T={azuky:['🌐 Internet','Azuky y Nota Roja rompen internet','La batalla está en todas partes.'], rq:['⚔️ Redes','Patrocinados de Quesada contra el Elegido de Gazir','El pique entre los dos bandos dispara la batalla.'], women:['👑 Redes','Batalla femenina','La comunidad se vuelca con la batalla.']}[ev.sub];
-    kick=T[0]; title=T[1]; body=`<div class="ex-row" style="justify-content:center; font-size:17px">${miniAvatar(ev.a,28)} ${fnameH(ev.a)} <span class="vs">vs</span> ${fnameH(ev.b)} ${miniAvatar(ev.b,28)}</div><p>${T[2]}</p><p>▶ ${fmtViews(ev.before||0)} → <b class="pos-v">${fmtViews(ev.after||0)}</b>${ev.inc?` · <b class="pos-v">+${money(ev.inc)}</b>`:''}</p>`; }
+    kick=T[0]; title=T[1]; body=`<div class="ex-row" style="justify-content:center; font-size:1.0625rem">${miniAvatar(ev.a,28)} ${fnameH(ev.a)} <span class="vs">vs</span> ${fnameH(ev.b)} ${miniAvatar(ev.b,28)}</div><p>${T[2]}</p><p>▶ ${fmtViews(ev.before||0)} → <b class="pos-v">${fmtViews(ev.after||0)}</b>${ev.inc?` · <b class="pos-v">+${money(ev.inc)}</b>`:''}</p>`; }
   else if(ev.type==='khan'){ kick='📉 Redes'; title='Un regreso decepcionante'; body= ev.ex ? `<p>La exhibición de ${nameH(f)} ha sido un desastre. La comunidad no da crédito.</p>` : `<p>${nameH(f)} cierra la temporada en ${ldef(ev.key).name} sin ganar una sola batalla y con 0 puntos. La comunidad no da crédito.</p>`; }
   else if(ev.type==='sweet'){ kick='😡 Redes'; title='Los fans de Sweet Pain se enfadan'; body=`<p>No han digerido la derrota contra ${fnameH(ev.rival)} y lo están pagando en redes.</p><p class="neg-v"><b>−10% de hype</b> para ${nameH(f)}.</p>`; }
   else if(ev.type==='ryker'){ kick='🎬 YouTube'; title=`Ryker hace un edit del minuto de ${f.name}`;
@@ -186,7 +186,7 @@ function showUQ(ev){
   else if(ev.type==='reggae'){ kick='🎶 Redes'; title=`${f.name} hizo un minutazo a puro reggae`; body=`<p>El minuto de ${nameH(f)} se ha hecho viral y su batalla no para de sumar.</p><p>▶ ${fmtViews(ev.before||0)} → <b class="pos-v">${fmtViews(ev.after||0)}</b>${ev.inc?` · <b class="pos-v">+${money(ev.inc)}</b>`:''}</p>`; }
   else if(ev.type==='local'){ kick='😤 Redes'; title='Los fans se quejan del localismo'; body=`<p>${nameH(f)} gana el ${ev.comp==='fms'?INTL.name:RB_INT.name} en México y las redes se llenan de quejas: dicen que le favorecieron por jugar en casa.</p><p class="neg-v"><b>−10% de hype</b> para ${nameH(f)} y para todos los participantes.</p>`; }
   else if(ev.type==='rival'){ const V=RIVAL_VARS[ev.v||0]; kick=V[0]; title=esc(rivalFill(V[1],ev));
-    body=`<div class="ex-row" style="justify-content:center; font-size:17px">${miniAvatar(ev.a,34)} ${fnameH(ev.a)} <span class="vs">vs</span> ${fnameH(ev.b)} ${miniAvatar(ev.b,34)}</div>
+    body=`<div class="ex-row" style="justify-content:center; font-size:1.0625rem">${miniAvatar(ev.a,34)} ${fnameH(ev.a)} <span class="vs">vs</span> ${fnameH(ev.b)} ${miniAvatar(ev.b,34)}</div>
       <p>${esc(rivalFill(V[2],ev))}</p>
       <div class="rv-cmp"><div><small>Antes</small><b>${fmtViews(ev.before||0)}</b></div><span class="rv-arrow">→</span><div><small>Después</small><b class="pos-v">${fmtViews(ev.after||0)}</b></div></div>
       <p style="text-align:center"><b class="pos-v">+15% de visitas</b>${ev.inc?` · <b class="pos-v">+${money(ev.inc)}</b>`:''}</p>`; }
@@ -198,14 +198,14 @@ function showUQ(ev){
       <div class="uq-split"><div class="uq-left"><div class="field-label" style="margin-top:10px">Rival de ${nameH(ri)} en la exhibición${G&&fby(G)?`: <b style="color:var(--white)">${nameH(fby(G))}</b>`:''}</div>
       <input id="uqQ" class="ex-q" placeholder="Buscar por nombre o país" value="${esc(state.ui.uqQ||'')}" oninput="state.ui.uqQ=this.value; showUQ(cur().uq.find(x=>x.id==='${ev.id}')); const e=document.getElementById('uqQ'); e.focus(); e.setSelectionRange(e.value.length,e.value.length);">
       <div class="pick-grid uq-grid">${el.map(x=>`<div class="pick-item ${G===x.id?'checked':''}" onclick="state.ui.uqGuest='${x.id}'; showUQ(cur().uq.find(y=>y.id==='${ev.id}'))">
-        <span class="mini-avatar" style="width:32px;height:32px;font-size:15px;${avatarDivStyle(x)}">${avatarContent(x)}</span>
+        <span class="mini-avatar" style="width:32px;height:32px;font-size:0.9375rem;${avatarDivStyle(x)}">${avatarContent(x)}</span>
         <div style="min-width:0;"><div class="pname">${nameH(x)}</div>${styleTag(x)}<div class="pcountry">${esc(x.country)}</div></div>
         <div class="pick-stats">Nivel <b>${x.nivel}</b><br>Fama <b>${x.fama}</b><br><span class="sal">${moneyK(exhibCost(x,ev.key))}</span></div></div>`).join('')}</div></div>
       <div class="uq-right"><div class="field-label" style="margin-top:10px">Fecha de la recuperativa${D!=null?`: <b style="color:var(--white)">${fmtDay(s.year,D)}</b>`:''}</div>
       ${uqMiniCal(s, ev, days, D)}</div></div>`;
     acts=`<button class="btn primary" ${G&&D!=null?'':'disabled'} onclick="uqSetUnavail('${ev.id}', state.ui.uqGuest, state.ui.uqDay)">Confirmar</button>`; }
   else if(ev.type==='recup'){ const m=L.rounds[ev.j][ev.mi]; const p=ptbOf(m); kick='🎤 Recuperativa'; title=`Batalla recuperativa · J${ev.j+1} de ${ldef(ev.key).short}`;
-    body=`<div class="ex-row" style="justify-content:center; font-size:18px">${miniAvatar(m.a,28)} ${fnameH(m.a)} <span class="vs">vs</span> ${fnameH(m.b)} ${miniAvatar(m.b,28)}</div>
+    body=`<div class="ex-row" style="justify-content:center; font-size:1.125rem">${miniAvatar(m.a,28)} ${fnameH(m.a)} <span class="vs">vs</span> ${fnameH(m.b)} ${miniAvatar(m.b,28)}</div>
       <p style="text-align:center">Gana <b>${fnameH(m.result.winner)}</b> ${esc(m.lb||'')} · PTB ${fpt(p[0])}–${fpt(p[1])} · ▶ ${fmtViews(m.views)}</p>`; }
   openModal(`<div class="uq">${['prep','driu','zasko','refuse','papo','unavail','sweet','reggae','khan','local'].includes(ev.type)&&f?`<div class="uq-face">${uqFace(f.id)}</div>`:''}<div class="st-kicker">${kick} · ${fmtDay(s.year,ev.day)}</div><h3 style="margin:4px 0 10px">${title}</h3>${body}</div>
     <div class="modal-actions">${acts}</div>`, ev.type==='unavail' ? 'uqwide' : undefined);
@@ -233,7 +233,7 @@ function showReplace(key){
     <p class="step-note" style="margin-bottom:8px">Ocupará su plaza en todos sus cruces. Caja: ${money(state.company.money)}</p>
     <input id="repQ" placeholder="Buscar por nombre o país" value="${esc(state.ui.repQ||'')}" oninput="state.ui.repQ=this.value; showReplace('${key}'); const e=document.getElementById('repQ'); e.focus(); e.setSelectionRange(e.value.length,e.value.length);">
     <div class="pick-grid rep-grid">${list.map(f=>{ const c=contractCost(f,key); const fx=isForeign(f,key); return `<div class="pick-item" onclick="pickReplace('${key}','${old}','${f.id}')">
-      <span class="mini-avatar" style="width:32px;height:32px;font-size:15px;${avatarDivStyle(f)}">${avatarContent(f)}</span>
+      <span class="mini-avatar" style="width:32px;height:32px;font-size:0.9375rem;${avatarDivStyle(f)}">${avatarContent(f)}</span>
       <div style="min-width:0;"><div class="pname">${nameH(f)}</div>${styleTag(f)}<div class="pcountry">${esc(f.country)}${fx?' <span class="tag-mini foreign">✈ viajes</span>':''}</div></div>
       <div class="pick-stats">Nivel <b>${f.nivel}</b><br>Fama <b>${f.fama}</b><br>Hype <b>${Math.round(f.hype||0)}</b><br><span class="sal">${moneyK(c)}</span></div></div>`; }).join('') || '<div class="step-note">Nadie coincide con la búsqueda.</div>'}</div>`, true);
 }
@@ -266,7 +266,7 @@ function renderExhib(s, L, key, j){
     <div class="ex-slots">${slot(A,'Freestyler 1')}<span class="vs">VS</span>${slot(B,'Freestyler 2')}</div>
     <input id="exQ_${key}" class="ex-q" placeholder="Buscar por nombre o país" value="${esc(state.ui['exQ_'+key]||'')}" oninput="state.ui['exQ_${key}']=this.value; render()">
     <div class="pick-grid ex-grid">${el.map(f=>{ const on=f.id===A||f.id===B; return `<div class="pick-item ${on?'checked':''}" onclick="exPick('${key}','${f.id}')">
-      <span class="mini-avatar" style="width:32px;height:32px;font-size:15px;${avatarDivStyle(f)}">${avatarContent(f)}</span>
+      <span class="mini-avatar" style="width:32px;height:32px;font-size:0.9375rem;${avatarDivStyle(f)}">${avatarContent(f)}</span>
       <div style="min-width:0;"><div class="pname">${nameH(f)}</div>${styleTag(f)}<div class="pcountry">${esc(f.country)}</div></div>
       <div class="pick-stats">Nivel <b>${f.nivel}</b><br>Fama <b>${f.fama}</b><br><span class="sal">${moneyK(exhibCost(f,key))}</span></div></div>`; }).join('') || '<div class="step-note">Nadie coincide con la búsqueda.</div>'}</div>
     <button class="btn small primary" style="margin-top:8px" ${A&&B&&A!==B?'':'disabled'} onclick="organizeExhib('${key}')">Organizar exhibición${cost?' · '+money(cost):''}</button></div>`;

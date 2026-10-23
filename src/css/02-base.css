@@ -12,8 +12,9 @@
   --silver:#b7b9bd;
   --bronze:#b0692f;
   --white:#f2f2f0;
-  --gray:#8d8d93;
-  --gray-dim:#5b5b60;
+  --gray:#a1a1a7;      /* textos secundarios: 6:1 o más sobre cualquier fondo */
+  --gray-dim:#86868b;  /* textos terciarios: 4,5:1 sobre el fondo más claro (WCAG AA) */
+  --line-field:#66666a; /* borde de inputs y selects: 3:1 sobre los fondos */
   --font-display:'Bebas Neue', 'Impact', 'Arial Narrow', sans-serif;
   --font-body:'Barlow', 'Helvetica Neue', Arial, sans-serif;
   --font-cond:'Barlow Condensed', 'Arial Narrow', sans-serif;
@@ -35,6 +36,8 @@ body{
 a{color:inherit;}
 button{font-family:var(--font-cond); cursor:pointer; border:none; outline:none; touch-action:manipulation;}
 button:focus-visible, [tabindex]:focus-visible, input:focus-visible, select:focus-visible{outline:2px solid var(--red-bright); outline-offset:2px;}
-input,select{font-family:var(--font-body); background:var(--bg-alt); border:1px solid var(--line); color:var(--white); border-radius:6px; padding:8px 10px;}
+input,select{font-family:var(--font-body); background:var(--bg-alt); border:1px solid var(--line-field); color:var(--white); border-radius:6px; padding:8px 10px;}
 h1,h2,h3,h4{font-family:var(--font-display); letter-spacing:0.03em; font-weight:400;}
+/* solo para lectores de pantalla (avisos de los toasts) */
+.visually-hidden:where(:not(:focus-within, :active)){position:absolute !important; clip-path:inset(50%) !important; overflow:hidden !important; width:1px !important; height:1px !important; margin:-1px !important; padding:0 !important; border:0 !important; white-space:nowrap !important;}
 

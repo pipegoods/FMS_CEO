@@ -178,7 +178,7 @@ function seasonTopFreestylers(s, n){
 }
 function topFreestylersHtml(s){
   const top=seasonTopFreestylers(s,10); if(!top.length) return '';
-  return `<div class="section-title" style="margin-top:18px"><h2 style="font-size:22px">Top 10 freestylers con más visitas</h2></div>
+  return `<div class="section-title" style="margin-top:18px"><h2 style="font-size:1.375rem">Top 10 freestylers con más visitas</h2></div>
   <div class="tb-list">${top.map((t,i)=>{ const f=fby(t.id); return `<div class="tb-row"><span class="tb-pos">${i+1}</span>
       <span class="tb-face w" style="${avatarDivStyle(f)}">${avatarContent(f)}</span>
       <div class="tb-info"><div class="tb-names"><span class="w">${nameH(f)}</span></div><div class="tb-meta">${t.n} batalla${t.n>1?'s':''}</div></div>
@@ -187,7 +187,7 @@ function topFreestylersHtml(s){
 }
 function topBattlesHtml(s){
   const top=seasonTopBattles(s,10); if(!top.length) return '';
-  return `<div class="section-title" style="margin-top:18px"><h2 style="font-size:22px">Top 10 batallas más vistas</h2></div>
+  return `<div class="section-title" style="margin-top:18px"><h2 style="font-size:1.375rem">Top 10 batallas más vistas</h2></div>
   <div class="tb-list">${top.map((t,i)=>{ const m=t.m; const wa=m.result.winner===m.a; const res=m.lb || (m.result.tiebreak?'Réplica':'');
     return `<div class="tb-row"><span class="tb-pos">${i+1}</span><img class="tb-logo" src="${t.logo}" alt="">
       <div class="tb-faces"><span class="tb-face ${wa?'w':''}" style="${avatarDivStyle(fby(m.a))}">${avatarContent(fby(m.a))}</span><span class="tb-face ${wa?'':'w'}" style="${avatarDivStyle(fby(m.b))}">${avatarContent(fby(m.b))}</span></div>
@@ -251,7 +251,7 @@ async function fmRun(tok){
   if(mv){
     const st=computeStandings(L); const q=(cur().intlEnabled && !isWS(SHOW.key))? intlSlotsPerLeague(natKeys(cur()).length):0;
     fmStage().innerHTML=`<div class="fm-mvpwrap" id="fmMW">
-      <div class="fm-table-side"><div class="fm-lineup-t" style="font-size:24px;text-align:left">Clasificación · tras la J${SHOW.j+1}</div>
+      <div class="fm-table-side"><div class="fm-lineup-t" style="font-size:1.5rem;text-align:left">Clasificación · tras la J${SHOW.j+1}</div>
         <table class="standings fm-st"><thead><tr><th>#</th><th>Freestyler</th><th class="num">PJ</th><th class="num">PTS</th></tr></thead><tbody>
         ${st.map((r,i)=>`<tr class="${i<q?'q':''} ${i>=st.length-2?'rel':''} ${r.id===mv.id?'mvp':''}" style="--i:${i}"><td class="pos">${i+1}</td><td><span style="display:inline-flex;align-items:center;gap:8px">${miniAvatar(r.id,22)} ${fnameH(r.id)}${r.id===mv.id?' <span class="mvp-tag">MVP</span>':''}</span></td><td class="num">${r.pj}</td><td class="pts num">${r.pts}</td></tr>`).join('')}
         </tbody></table></div>
